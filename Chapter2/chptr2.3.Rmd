@@ -1,0 +1,49 @@
+# 2.3: Classical confidence intervals
+
+## CI for continuous data, Pg 18
+
+```{r}
+(y <- c(35,34,38,35,37))
+```
+
+```{r}
+(n <- length(y))
+```
+
+```{r}
+(estimate <- mean(y))
+```
+
+```{r}
+(se <- sd(y)/sqrt(n))
+```
+
+```{r}
+(int.50 <- estimate + qt(c(.25,.75),n-1)*se)
+```
+
+```{r}
+(int.95 <- estimate + qt(c(.025,.975),n-1)*se)
+```
+
+## CI for proportions, Pg 18
+
+```{r}
+(y <- 700)
+```
+
+```{r}
+(n <- 1000)
+```
+
+```{r}
+(estimate <- y/n)
+```
+
+```{r}
+(se <- sqrt (estimate*(1-estimate)/n))
+```
+
+```{r}
+(int.95 <- estimate + qnorm(c(.025,.975))*se)
+```
