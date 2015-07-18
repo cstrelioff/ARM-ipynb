@@ -2,7 +2,7 @@
 
 Running through the examples in Gelman and Hill's *Data Analysis Using
 Regression and Multilevel/Hierarchical Models* in both R and Python using
-IPython/Jupyter notebooks. To make the most of thi code you need a copy of the
+IPython/Jupyter notebooks. To make the most of the code you need a copy of the
 book-- buy one or get from the library.  The websites for the book and
 data/code are:
 
