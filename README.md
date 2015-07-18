@@ -2,7 +2,13 @@
 
 Running through the examples in Gelman and Hill's *Data Analysis Using
 Regression and Multilevel/Hierarchical Models* in both R and Python using
-IPython/Jupyter notebooks.
+IPython/Jupyter notebooks. To make the most of thi code you need a copy of the
+book-- buy one or get from the library.  The websites for the book and
+data/code are:
+
+* [book website](http://www.stat.columbia.edu/~gelman/arm/)
+
+* [book software and data files](http://www.stat.columbia.edu/~gelman/arm/software/)
 
 If you'd like to use the IPython notebooks, just grab them and compute away. Of
 course, relevant Python and R packages will need to be installed for the 
@@ -20,8 +26,16 @@ patterns:
 
 ### File Conversion
 
-**Rmd to ipynb**
+**Python: md to ipynb**
 
 ```bash
-notedown chptr2-3.Rmd --knit --rmagic > chptr2-3.ipynb
+notedown chptr2.3.md > chptr2.3.ipynb
+```
+
+**R: Rmd to ipynb**
+
+I add the `-R.ipynb` ending for notebooks running R code using `rpy2`.
+
+```bash
+notedown chptr2.3.Rmd --knit --rmagic > chptr2.3-R.ipynb
 ```
