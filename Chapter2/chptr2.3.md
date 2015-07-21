@@ -136,3 +136,76 @@ int95 = estimate + t.ppf([0.025, 0.975], n-1)*se
 int95
 ```
 
+## Plot Figure 2.3, Pg 19
+
+```python
+#R: par(mar=c(5,5,4,2)+.1)
+```
+
+The **polls.dat** file has an unsual format--
+
+```python
+%%bash
+head ../../ARM_Data/death.polls/polls.dat
+```
+
+```python
+# Data is available in death.polls directory of ARM_Data
+# R: polls <- matrix(scan("../../ARM_Data/death.polls/polls.dat"),
+#                    ncol=5, byrow=TRUE)
+data = []
+temp = []
+ncols = 5
+with open("../../ARM_Data/death.polls/polls.dat") as f:
+    for line in f.readlines():
+        for d in line.strip().split(' '):
+            temp.append(float(d))
+        if (len(temp) == ncols):
+            data.append(temp)
+            temp = []
+
+polls = pd.DataFrame(data, columns=[u'year', u'month', u'for', u'against', u'unknown'])
+polls.head()
+```
+
+```python
+#R: support <- polls[,3]/(polls[,3]+polls[,4])
+polls[u'support'] = polls[u'for']/(polls[u'for']+polls[u'against'])
+polls.head()
+```
+
+```python
+#R: year <-  polls[,1] + (polls[,2]-6)/12
+polls[u'year_float'] = polls[u'year'] + (polls[u'month']-6)/12
+polls.head()
+```
+
+```python
+# add error column -- symmetric so only add one column
+# assumes sample size -- why?? Isn't it 100??
+polls[u'support_error'] = np.sqrt(polls[u'support']*(1-polls[u'support'])/1000)
+polls.head()
+```
+
+```python
+#R: plot(year, support*100, xlab="Year", ylim=c(min(100*support)-1, max(100*support)+1),
+#        ylab="Percentage support for the death penalty", cex=1.1, cex.main=1.2,
+#        cex.axis=1.1, cex.lab=1.1, pch=20)
+#   
+#   for (i in 1:nrow(polls))
+#     lines (rep(year[i],2), 100*(support[i]+c(-1,1)*sqrt(support[i]*(1-support[i])/1000)))
+plt.style.use('ggplot')
+plt.errorbar(polls[u'year_float'], 100*polls[u'support'],
+             yerr=100*polls[u'support_error'], fmt='ko',
+             ms=4, capsize=0)
+plt.ylim(np.min(100*polls[u'support'])-2, np.max(100*polls[u'support']+2))
+plt.ylabel(u'Percentage support for the death penalty')
+plt.xlabel(u'Year')
+
+fig = plt.gcf()
+fig.set_size_inches(6,6)
+```
+
+```python
+
+```
