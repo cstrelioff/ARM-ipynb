@@ -138,16 +138,27 @@ int95
 
 ## Plot Figure 2.3, Pg 19
 
-```python
-#R: par(mar=c(5,5,4,2)+.1)
-```
+The **polls.dat** file has an unusual format. The data that we'd like to have in
+a single row is split across 4 rows:
 
-The **polls.dat** file has an unsual format--
+* year month
+* percentage support
+* percentage against
+* percentage no opinion
+
+The data seems to be a subset of the Gallup data, available here:
+http://www.gallup.com/poll/1606/Death-Penalty.aspx
+
+We can see the unusual layout using the **bash** command *head* (linux/osx only,
+sorry..)
 
 ```python
 %%bash
 head ../../ARM_Data/death.polls/polls.dat
 ```
+
+Using knowledge of the file layout we can read in the file and pre-process into
+appropriate rows/columns for passing into a pandas dataframe:
 
 ```python
 # Data is available in death.polls directory of ARM_Data
@@ -164,13 +175,17 @@ with open("../../ARM_Data/death.polls/polls.dat") as f:
             data.append(temp)
             temp = []
 
-polls = pd.DataFrame(data, columns=[u'year', u'month', u'for', u'against', u'unknown'])
+polls = pd.DataFrame(data, columns=[u'year', u'month', u'perc for', u'perc against', u'perc no opinion'])
 polls.head()
 ```
 
 ```python
 #R: support <- polls[,3]/(polls[,3]+polls[,4])
-polls[u'support'] = polls[u'for']/(polls[u'for']+polls[u'against'])
+#
+# --Note: this give the (percent) support for thise that have an opinion
+# --The percentage with no opinion are ignored
+# --This results in difference between our plot (below) and the Gallup plot (link above)
+polls[u'support'] = polls[u'perc for']/(polls[u'perc for']+polls[u'perc against'])
 polls.head()
 ```
 
@@ -182,7 +197,8 @@ polls.head()
 
 ```python
 # add error column -- symmetric so only add one column
-# assumes sample size -- why?? Isn't it 100??
+# assumes sample size N=1000
+# uses +/- 1 standard error, resulting in 68% confidence
 polls[u'support_error'] = np.sqrt(polls[u'support']*(1-polls[u'support'])/1000)
 polls.head()
 ```
@@ -198,14 +214,126 @@ plt.style.use('ggplot')
 plt.errorbar(polls[u'year_float'], 100*polls[u'support'],
              yerr=100*polls[u'support_error'], fmt='ko',
              ms=4, capsize=0)
-plt.ylim(np.min(100*polls[u'support'])-2, np.max(100*polls[u'support']+2))
 plt.ylabel(u'Percentage support for the death penalty')
 plt.xlabel(u'Year')
+# you can adjust y-limits with command like below
+# I will leave the default behavior
+#plt.ylim(np.min(100*polls[u'support'])-2, np.max(100*polls[u'support']+2))
 
 fig = plt.gcf()
 fig.set_size_inches(6,6)
 ```
 
-```python
+## Weighted averages, Pg 19
 
+The example R-code for this part is incomplete, so I will make up `N`, `p` and
+`se` loosely related to the text on page 19.
+
+```python
+#R: N <- c(66030000, 81083600, 60788845)
+#   p <- c(0.55, 0.61, 0.38)
+#   se <- c(0.02, 0.03, 0.03)
+N = np.array([66030000, 81083600, 60788845])
+p = np.array([0.55, 0.61, 0.38])
+se = np.array([0.02, 0.03, 0.03])
 ```
+
+```python
+#R: w.avg <- sum(N*p)/sum(N)
+w_avg = np.sum(N*p)/np.sum(N)
+w_avg
+```
+
+```python
+#R: se.w.avg <- sqrt(sum((N*se/sum(N))^2))
+se_w_avg = np.sqrt(np.sum((N*se/np.sum(N))**2))
+se_w_avg
+```
+
+```python
+# this uses +/- 2 std devs
+#R: int.95 <- w.avg + c(-2,2)*se.w.avg
+int_95 = w_avg + np.array([-2,2])*se_w_avg
+int_95
+```
+
+## CI using simulations, Pg 20
+
+```python
+# import the normal from scipy.stats
+# repeated to make sure that it is clear that it is needed for this section
+from scipy.stats import norm
+
+# also need this for estimating CI from samples
+from scipy.stats.mstats import mquantiles
+```
+
+```python
+#R: n.men <- 500
+n_men = 500
+n_men
+```
+
+```python
+#R: p.hat.men <- 0.75
+p_hat_men = 0.75
+p_hat_men
+```
+
+```python
+#R: se.men <- sqrt (p.hat.men*(1-p.hat.men)/n.men)
+se_men = np.sqrt(p_hat_men*(1.-p_hat_men)/n_men)
+se_men
+```
+
+```python
+#R: n.women <- 500
+n_women = 500
+n_women
+```
+
+```python
+#R: p.hat.women <- 0.65
+p_hat_women = 0.65
+p_hat_women
+```
+
+```python
+#R: se.women <- sqrt(p.hat.women*(1-p.hat.women)/n.women)
+se_women = np.sqrt(p_hat_women*(1.-p_hat_women)/n_women)
+se_women
+```
+
+```python
+#R: n.sims <- 10000
+n_sims = 10000
+n_sims
+```
+
+```python
+#R: p.men <- rnorm(n.sims, p.hat.men, se.men)
+p_men = norm.rvs(size=n_sims, loc=p_hat_men, scale=se_men)
+p_men[:10] # show first ten
+```
+
+```python
+#R: p.women <- rnorm(n.sims, p.hat.women, se.women)
+p_women = norm.rvs(size=n_sims, loc=p_hat_women, scale=se_women)
+p_women[:10] # show first ten
+```
+
+```python
+#R: ratio <- p.men/p.women
+ratio = p_men/p_women
+ratio[:10] # show first ten
+```
+
+```python
+#R: int.95 <- quantile(ratio, c(.025,.975))
+
+# the values of alphap and betap replicate the R default behavior
+# see http://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.mstats.mquantiles.html
+int95 = mquantiles(ratio, prob=[0.025,0.975], alphap=1., betap=1.)
+int95
+```
+
