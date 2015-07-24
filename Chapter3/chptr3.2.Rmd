@@ -1,0 +1,43 @@
+# 3.1: Multiple predictors
+
+## Read the data
+
+Data are in the *child.iq* directory of the ARM_Data download-- you might have
+to change the path I use below to reflect the path on your computer.
+
+```{r}
+# I had to import foreign to get access to read.dta
+library("foreign")
+kidiq <- read.dta("../../ARM_Data/child.iq/kidiq.dta")
+
+# I won't attach kidiq-- i generally don't attach to avoid confusion(s)
+#attach(kidiq)
+```
+
+Load the *arm* library-- see the Chapter 3.1 notebook if you need help.
+
+```{r}
+library("arm")
+```
+
+## Regression-- two predictors
+
+```{r}
+fit2 <- lm(kidiq$kid_score ~ kidiq$mom_hs + kidiq$mom_iq)
+display(fit2)
+```
+
+```{r}
+plot(kidiq$mom_iq, kidiq$kid_score,
+     xlab="Mother IQ score", 
+     ylab="Child test score",
+     pch=20, xaxt="n", yaxt="n", type="n")
+curve(coef(fit2)[1] + coef(fit2)[2] + coef(fit2)[3]*x, add=TRUE, col="gray")
+curve(coef(fit2)[1] + coef(fit2)[3]*x, add=TRUE)
+points(kidiq$mom_iq[kidiq$mom_hs==0],
+       kidiq$kid_score[kidiq$mom_hs==0], pch=19)
+points(kidiq$mom_iq[kidiq$mom_hs==1], 
+       kidiq$kid_score[kidiq$mom_hs==1], col="gray", pch=19)
+axis(1, c(80,100,120,140))
+axis(2, c(20,60,100,140))
+```
