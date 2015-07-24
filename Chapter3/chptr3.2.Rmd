@@ -1,4 +1,4 @@
-# 3.1: Multiple predictors
+# 3.2: Multiple predictors
 
 ## Read the data
 
