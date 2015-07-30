@@ -36,14 +36,11 @@ print(fit0.summary())
 
 ## Plot Figure 3.1, Pg 32
 
-A couple of notes for the python version:
+A note for the python version:
 
 * I have **not** included jitter, in the vertical or horizontal directions.
   Instead, the data is plotted with opacity so the regions with high
   data-density can be distinguished.
-* I left the color defaults for the pandas and matplotlb output-- the
-  data and line can be made black by adding *c='k'* argument to both plot
-  elements.
 
 ```python
 fig0, ax0 = plt.subplots(figsize=(8, 6))
