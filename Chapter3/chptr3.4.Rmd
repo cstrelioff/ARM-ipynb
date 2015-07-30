@@ -1,0 +1,51 @@
+# 3.4 Statistical inference
+
+## Read the data
+
+Data are in the *child.iq* directory of the ARM_Data download-- you might have
+to change the path I use below to reflect the path on your computer.
+
+```{r}
+# I had to import foreign to get access to read.dta
+library("foreign")
+kidiq <- read.dta("../../ARM_Data/child.iq/kidiq.dta")
+
+# I won't attach kidiq-- i generally don't attach to avoid confusion(s)
+#attach(kidiq)
+```
+
+Load the *arm* library-- see the Chapter 3.1 notebook if you need help.
+
+```{r}
+library("arm")
+```
+
+## Regression-- to demonstrate reports of fit, Pg38
+
+```{r}
+fit.3 <- lm(kidiq$kid_score ~ kidiq$mom_hs + kidiq$mom_iq)
+```
+
+## Display, Pg 38
+
+Just right?
+
+```{r}
+display(fit.3)
+```
+
+## Print, Pg 39
+
+Too little information?
+
+```{r}
+print(fit.3)
+```
+
+## Summary, Pg 38
+
+Too much information?
+
+```{r}
+summary(fit.3)
+```
