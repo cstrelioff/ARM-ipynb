@@ -178,7 +178,7 @@ jitter.mom_hs <- jitter.binary(kidiq$mom_hs)
 
 ```{r}
 # resize plot using cell command like:
-# %%R -w 960 -h 480 -u px
+# %%R -w 780 -h 480 -u px
 par(mfrow=c(1,2))
 
 # PLOT 1
